@@ -3,6 +3,8 @@ import { Formik, Form, Field, ErrorMessage } from "formik";
 import { nanoid } from "nanoid";
 import { useId } from "react";
 import * as Yup from "yup";
+import { addContact } from "../../redux/contactsSlice";
+import { useDispatch } from "react-redux";
 
 const ContactsSchema = Yup.object().shape({
   name: Yup.string()
@@ -10,30 +12,41 @@ const ContactsSchema = Yup.object().shape({
     .max(50, "Too Long!")
     .required("Required"),
   number: Yup.string()
-    .matches(/^\d{3}-\d{2}-\d{2}$/, 'Invalid phone number! Enter the number in the format 000-00-00')
+    .matches(
+      /^\d{3}-\d{2}-\d{2}$/,
+      "Invalid phone number! Enter the number in the format 000-00-00"
+    )
     .min(6, "Too Short!")
     .max(18, "Too Long!")
     .required("Required"),
 });
 
-const ContactForm = ({ onAdd }) => {
+const initialValues = {
+  name: "",
+  number: "",
+};
+
+const ContactForm = () => {
   const nameField = useId();
   const numberField = useId();
 
+  const dispatch = useDispatch();
+
   const handleSubmit = (values, actions) => {
     console.log(values);
-
-    onAdd({
+    const newContact = {
       id: nanoid(),
-      ...values,
-    });
+      name: values.name,
+      number: values.number,
+    };
+    dispatch(addContact(newContact));
     actions.resetForm();
-  }
+  };
 
   return (
     <>
       <Formik
-        initialValues={{ name: '', number: '' }}
+        initialValues={initialValues}
         onSubmit={handleSubmit}
         validationSchema={ContactsSchema}
       >
@@ -60,7 +73,11 @@ const ContactForm = ({ onAdd }) => {
               id={numberField}
               placeholder="000-00-00"
             />
-            <ErrorMessage className={css.error} name="number" component="span" />
+            <ErrorMessage
+              className={css.error}
+              name="number"
+              component="span"
+            />
           </div>
           <button type="submit" className={css.button}>
             Add contact
@@ -69,6 +86,6 @@ const ContactForm = ({ onAdd }) => {
       </Formik>
     </>
   );
-}
+};
 
 export default ContactForm;

@@ -2,7 +2,7 @@
 	margin: o auto;
 	display: flex;
 	flex-direction: column;
-
+	
 	max-width: 1440px;
 	padding: 0 30px;
 	gap: 20px;
